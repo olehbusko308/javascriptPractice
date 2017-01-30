@@ -3,7 +3,8 @@
         <canvas id="table" width="1760" height="880"></canvas>
         <canvas id="dealer" width="200" height="240";></canvas>
         <canvas id="player" width="250" height="370"; class="chair"></canvas>
-        
+      
+          
         <canvas id="chair1" class="chair" width="250" height="370" onmouseover="hover(1)" onmouseout="unhover(1)" onclick="fold(1)"></canvas>
         <canvas id="chair2" class="chair" width="250" height="370" onmouseover="hover(2)" onmouseout="unhover(2)" onclick="fold(2)"></canvas>
         <canvas id="chair3" class="chair" width="250" height="370" onmouseover="hover(3)" onmouseout="unhover(3)" onclick="fold(3)"></canvas>
@@ -11,6 +12,7 @@
         
         <canvas id="chair5" class="chair" width="250" height="370" onmouseover="hover(5)" onmouseout="unhover(5)" onclick="fold(5)"></canvas>
         <canvas id="chair6" class="chair" width="250" height="370" onmouseover="hover(6)" onmouseout="unhover(6)" onclick="fold(6)"></canvas>
+        
         
         <canvas id="card1" class="card" width="85" height="115"></canvas>
         <canvas id="card2" class="card" width="85" height="115"></canvas>
@@ -28,10 +30,17 @@
         
         <img id="firstcard" src="backofcard.jpg" alt="Back of a card" style="width:35px;height:49px;">
         <img id="secondcard" src="backofcard.jpg" alt="Back of a card" style="width:35px;height:49px;">
+        
+        <button id="call" class="button" onmouseover="over('call')" onmouseout="out('call')">Call</button>
+        <button id="raise" class="button" onmouseover="over('raise')" onmouseout="out('raise')">Raise</button>
+        <button id="fold" class="button" onmouseover="over('fold')" onmouseout="out('fold')">Fold</button>
+        <div id="shadow"></div>
     </div>
+    
     
 </body>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
     var table = document.getElementById("table");
     var tableCtx = table.getContext("2d");
@@ -45,7 +54,7 @@
     var dealerpic = new Image();
 
     tablepic.onload = function(){
-        tableCtx.drawImage(tablepic,0,0,2282,1116,0,0,880,440);
+        tableCtx.drawImage(tablepic,0,0,2302,1142,0,0,880,440);
     }
     
     dealerCtx.scale(2,2);
@@ -61,7 +70,7 @@
         dealerCtx.drawImage(dealerpic,0,0,536,542,0,0,100,100)
     }
     
-    tablepic.src="table3.png";
+    tablepic.src="table.png";
     dealerpic.src="dealer.png";
     
     function hover(x){
@@ -74,6 +83,14 @@
     
     function fold(x){
         document.getElementById("chair"+x).style.opacity = 0.5;
+    }
+    
+    function over(x){
+        document.getElementById(""+x+"").style.boxShadow ="0 0 3pt 2.5pt #ffff99";
+    }
+    
+    function out(x){
+        document.getElementById(x).style.boxShadow ="";
     }
     
     for(var i = 1; i < 7;i++){
@@ -183,7 +200,7 @@
     potCtx.textAlign = "center";
 
     potCtx.fillText("1000", 45, 20);
-     
+         
 </script>
 
 <style>
@@ -222,17 +239,17 @@
     
     #chair5 {
         top:310px;
-        left: 645px;
+        left: 655px;
     }
     
     #chair6 {
         top:310px;
-        left: 115px;
+        left: 95px;
     }
     
     #player {
         top:310px;
-        left: 335px;
+        left: 375px;
     }
     
     #main {
@@ -267,7 +284,7 @@
     }
     
     #card1 {
-        left: 420px;
+        left: 470px;
         background: grey;
         top:350px;
         -ms-transform: rotate(-15deg);
@@ -278,7 +295,7 @@
     #card2 {
         background: white;
         top:350px;
-        left:457px;
+        left:507px;
         -ms-transform: rotate(15deg); 
         -webkit-transform: rotate(15deg);
         transform: rotate(15deg); 
@@ -356,4 +373,55 @@
         top:185px;
         left: 70px;
     }
+    
+    body {
+        background-image: url("gradient_squares.png");
+        background-repeat: repeat;
+    }
+    
+    .button {
+        background-color: #2F2F2F;
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        font-family:Frosty;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        width: 60px;
+        height: 30px;
+        opacity: 0.9;
+        border-radius: 3px;
+    }
+    
+    #call {
+        position:absolute;
+        top:332px;
+        left: 310px;
+    }
+    
+    #fold {
+        position: absolute;
+        top:367px;
+        left: 310px;
+    }
+    
+    #raise {
+        position: absolute;
+        top:402px;
+        left: 310px;
+    }
+    
+    #shadow {
+        position: absolute;
+        width: 845.5px;
+        height: 409px;
+        margin-top:-428px;
+        margin-left: 16.5px;
+        border-radius: 205px;
+        box-shadow: 0px 0px 7px black;
+        z-index: -1;
+    }
+
 </style>
