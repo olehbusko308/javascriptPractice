@@ -21,7 +21,13 @@
         <canvas id="tablecard4" class="card" width="85" height="115"></canvas>
         <canvas id="tablecard5" class="card" width="85" height="115"></canvas>
         
-        <canvas id="pot" width="20" height="20"></canvas>
+        <canvas id="pot" width="220" height="54"></canvas>
+        <canvas id="potimage" width="30" height="30"></canvas>
+        
+        <h1 id="dealersign"  width="25" height="25">D</h1>
+        
+        <img id="firstcard" src="backofcard.jpg" alt="Back of a card" style="width:35px;height:49px;">
+        <img id="secondcard" src="backofcard.jpg" alt="Back of a card" style="width:35px;height:49px;">
     </div>
     
 </body>
@@ -33,7 +39,7 @@
     
     var dealer = document.getElementById("dealer");
     var dealerCtx = dealer.getContext("2d");
-    dealerCtx.scale(2,2);
+
     
     var tablepic = new Image();
     var dealerpic = new Image();
@@ -42,12 +48,21 @@
         tableCtx.drawImage(tablepic,0,0,2282,1116,0,0,880,440);
     }
     
+    dealerCtx.scale(2,2);
+    dealerCtx.fillStyle = "#2F2F2F";
+    dealerCtx.fillRect(0,0,100,125);
+    dealerCtx.font = "bold 17px Frosty";
+    dealerCtx.fillStyle = "white";
+    dealerCtx.textAlign = "center";
+
+    dealerCtx.fillText("Dealer", 48, 115);
+    
     dealerpic.onload = function(){
-        dealerCtx.drawImage(dealerpic,0,0,536,542,0,0,100,125)
+        dealerCtx.drawImage(dealerpic,0,0,536,542,0,0,100,100)
     }
     
     tablepic.src="table3.png";
-    dealerpic.src="dealer.png"
+    dealerpic.src="dealer.png";
     
     function hover(x){
         document.getElementById("chair"+x).style.boxShadow ="0 0 3pt 2pt #6699ff";
@@ -139,15 +154,35 @@
     playerCtx.fillText("$1000", 60, 177);
     
     
-    var pot = document.getElementById("pot");
-    potCtx = pot.getContext("2d");
+    var potimage = document.getElementById("potimage");
+    potimageCtx = potimage.getContext("2d");
     var chip = new Image();
     
     chip.onload = function(){
-        potCtx.drawImage(chip, 0, 0, 1088, 1084, 0, 0, 20, 20);
+        potimageCtx.drawImage(chip, 0, 0, 1088, 1084, 0, 0, 30, 30);
     }
     
     chip.src = "dealerchip.png";
+    
+    var pot = document.getElementById("pot");
+    var potCtx = pot.getContext("2d");
+    
+    var grd = potCtx.createLinearGradient(50,0,50,15);
+    grd.addColorStop(0,"#FFD700");
+    grd.addColorStop(1,"#FFA500");
+    
+    potCtx.scale(2,2);
+    
+    pot.style.boxShadow ="0 0 2pt 2pt #FFA500";
+    
+    potCtx.fillStyle = grd;
+    potCtx.fillRect(0,0,110,28);
+    
+    potCtx.font = "bold 18px Frosty";
+    potCtx.fillStyle = "#2F2F2F";
+    potCtx.textAlign = "center";
+
+    potCtx.fillText("1000", 45, 20);
      
 </script>
 
@@ -279,13 +314,46 @@
         background: white;
     }
     
-    #pot {
+    #potimage {
         position: absolute;
-
-        left: 380px;
+        left: 370px;
         top:75px;
         border-radius: 21px;
     }
     
+    #pot {
+        position: absolute;
+        left: 380px;
+        top:76px;
+        background: grey;
+        border-radius: 5px;
+        width: 110px;
+        height: 27px;
+    }
 
+    #dealersign {
+        position:absolute;
+        font-size: 15px;
+        background: #4990E2;
+        padding: 8px;
+        padding-left: 12px;
+        padding-right: 10px;
+        border-radius: 30px;
+        top:95px;
+        left: 76px;
+    }
+    
+    #firstcard {
+        position: absolute;
+        top:185px;
+        left: 60px;
+        border-radius: 3px;
+    }
+
+    #secondcard {
+        position: absolute;
+        border-radius: 3px;
+        top:185px;
+        left: 70px;
+    }
 </style>
