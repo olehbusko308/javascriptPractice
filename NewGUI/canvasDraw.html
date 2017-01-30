@@ -1,7 +1,7 @@
 <body>
     <div id="container" width="880" height="440">
         <canvas id="table" width="1760" height="880"></canvas>
-        <canvas id="dealer" width="200" height="250";></canvas>
+        <canvas id="dealer" width="200" height="240";></canvas>
         <canvas id="player" width="250" height="370"; class="chair"></canvas>
         
         <canvas id="chair1" class="chair" width="250" height="370" onmouseover="hover(1)" onmouseout="unhover(1)" onclick="fold(1)"></canvas>
@@ -14,6 +14,14 @@
         
         <canvas id="card1" class="card" width="85" height="115"></canvas>
         <canvas id="card2" class="card" width="85" height="115"></canvas>
+        
+        <canvas id="tablecard1" class="card" width="85" height="115"></canvas>
+        <canvas id="tablecard2" class="card" width="85" height="115"></canvas>
+        <canvas id="tablecard3" class="card" width="85" height="115"></canvas>
+        <canvas id="tablecard4" class="card" width="85" height="115"></canvas>
+        <canvas id="tablecard5" class="card" width="85" height="115"></canvas>
+        
+        <canvas id="pot" width="20" height="20"></canvas>
     </div>
     
 </body>
@@ -35,7 +43,7 @@
     }
     
     dealerpic.onload = function(){
-        dealerCtx.drawImage(dealerpic,0,0,1288,1532,0,0,100,125)
+        dealerCtx.drawImage(dealerpic,0,0,536,542,0,0,100,125)
     }
     
     tablepic.src="table3.png";
@@ -129,6 +137,17 @@
 
     playerCtx.fillText("Name", 60, 20);
     playerCtx.fillText("$1000", 60, 177);
+    
+    
+    var pot = document.getElementById("pot");
+    potCtx = pot.getContext("2d");
+    var chip = new Image();
+    
+    chip.onload = function(){
+        potCtx.drawImage(chip, 0, 0, 1088, 1084, 0, 0, 20, 20);
+    }
+    
+    chip.src = "dealerchip.png";
      
 </script>
 
@@ -157,28 +176,28 @@
     }
     
     #chair3 {
-        top:70px;
+        top:80px;
         left: -30px;
     }
     
     #chair4 {
-        top:70px;
+        top:80px;
         left: 785px;
     }
     
     #chair5 {
-        top:300px;
+        top:310px;
         left: 645px;
     }
     
     #chair6 {
-        top:300px;
+        top:310px;
         left: 115px;
     }
     
     #player {
-        top:300px;
-        left: 325px;
+        top:310px;
+        left: 335px;
     }
     
     #main {
@@ -209,26 +228,63 @@
     .card {
         position:absolute;
         border-radius: 5px;
+        border:black solid 1px;
     }
     
     #card1 {
-        left: 410px;
+        left: 420px;
         background: grey;
-        top:340px;
-        border:black solid 1px;
-        -ms-transform: rotate(-15deg); /* IE 9 */
-        -webkit-transform: rotate(-15deg); /* Safari */
-        transform: rotate(-15deg); /* Standard syntax */
+        top:350px;
+        -ms-transform: rotate(-15deg);
+        -webkit-transform: rotate(-15deg);
+        transform: rotate(-15deg); 
     }
     
     #card2 {
         background: white;
-        top:340px;
-        left:447px;
-        border:black solid 1px;
-        -ms-transform: rotate(15deg); /* IE 9 */
-        -webkit-transform: rotate(15deg); /* Safari */
-        transform: rotate(15deg); /* Standard syntax */
+        top:350px;
+        left:457px;
+        -ms-transform: rotate(15deg); 
+        -webkit-transform: rotate(15deg);
+        transform: rotate(15deg); 
+    }
+    
+    #tablecard1 {
+        top:130px;
+        left: 200px;
+        background: white;
+    }
+    
+    #tablecard2 {
+        top:130px;
+        left: 295px;
+        background: white;
+    }
+    
+    #tablecard3 {
+        top:130px;
+        left: 390px;
+        background: white;
+    }
+    
+    #tablecard4 {
+        top:130px;
+        left: 485px;
+        background: white;
+    }
+    
+    #tablecard5 {
+        top:130px;
+        left: 580px;
+        background: white;
+    }
+    
+    #pot {
+        position: absolute;
+
+        left: 380px;
+        top:75px;
+        border-radius: 21px;
     }
     
 
