@@ -1,22 +1,31 @@
 <body>
     <div id="container" width="880" height="440">
-        <canvas id="table" width="880" height="440"></canvas>
-        <canvas id="dealer" width="100" height="125";></canvas>
-        <canvas id="player" width="125" height="175"; class="chair"></canvas>
-        <canvas id="chair1" class="chair" width="125" height="185" onmouseover="hover(1)" onmouseout="unhover(1)" onclick="fold(1)"></canvas>
-        <canvas id="chair2" class="chair" width="125" height="185" onmouseover="hover(2)" onmouseout="unhover(2)" onclick="fold(2)"></canvas>
+        <canvas id="table" width="1760" height="880"></canvas>
+        <canvas id="dealer" width="200" height="250";></canvas>
+        <canvas id="player" width="250" height="370"; class="chair"></canvas>
         
-        <canvas id="card1" class="card" width="75" height="95"></canvas>
-        <canvas id="card2" class="card" width="75" height="95"></canvas>
+        <canvas id="chair1" class="chair" width="250" height="370" onmouseover="hover(1)" onmouseout="unhover(1)" onclick="fold(1)"></canvas>
+        <canvas id="chair2" class="chair" width="250" height="370" onmouseover="hover(2)" onmouseout="unhover(2)" onclick="fold(2)"></canvas>
+        <canvas id="chair3" class="chair" width="250" height="370" onmouseover="hover(3)" onmouseout="unhover(3)" onclick="fold(3)"></canvas>
+        <canvas id="chair4" class="chair" width="250" height="370" onmouseover="hover(4)" onmouseout="unhover(4)" onclick="fold(4)"></canvas>
+        
+        <canvas id="chair5" class="chair" width="250" height="370" onmouseover="hover(5)" onmouseout="unhover(5)" onclick="fold(5)"></canvas>
+        <canvas id="chair6" class="chair" width="250" height="370" onmouseover="hover(6)" onmouseout="unhover(6)" onclick="fold(6)"></canvas>
+        
+        <canvas id="card1" class="card" width="85" height="115"></canvas>
+        <canvas id="card2" class="card" width="85" height="115"></canvas>
     </div>
+    
 </body>
 
 <script>
     var table = document.getElementById("table");
     var tableCtx = table.getContext("2d");
+    tableCtx.scale(2,2);
     
     var dealer = document.getElementById("dealer");
     var dealerCtx = dealer.getContext("2d");
+    dealerCtx.scale(2,2);
     
     var tablepic = new Image();
     var dealerpic = new Image();
@@ -44,50 +53,127 @@
         document.getElementById("chair"+x).style.opacity = 0.5;
     }
     
-    for(var i = 1; i < 3;i++){
+    for(var i = 1; i < 7;i++){
         var chair = document.getElementById("chair"+i);
         var chairCtx = chair.getContext("2d");
         
-        chairCtx.font = "bold 20px Lucida Console";
+        chairCtx.scale(2,2);
+        chairCtx.font = "bold 20px Frosty";
         chairCtx.fillStyle = "white";
         chairCtx.textAlign = "center";
+        
         chairCtx.fillText("Name", 60, 20);
         chairCtx.fillText("$1000", 60, 177);
-
         
     }
+
     
     var chair1 = document.getElementById("chair1");
     var chair2 = document.getElementById("chair2");
+    var chair3 = document.getElementById("chair3");
+    var chair4 = document.getElementById("chair4");
+    var chair5 = document.getElementById("chair5");
+    var chair6 = document.getElementById("chair6");
+    var player = document.getElementById("player");
+    
     var chairCtx1 = chair1.getContext("2d");
     var chairCtx2 = chair2.getContext("2d");
+    var chairCtx3 = chair3.getContext("2d");
+    var chairCtx4 = chair4.getContext("2d");
+    var chairCtx5 = chair5.getContext("2d");
+    var chairCtx6 = chair6.getContext("2d");
+    var playerCtx = player.getContext("2d");
             
-    var picture = new Image();
+    var player1 = new Image();
+    var player2 = new Image();
+    var player3 = new Image();
+    var player4 = new Image();
+    var player5 = new Image();
+    var player6 = new Image();
+    var player7 = new Image();
 
-    picture.onload = function(){
-        chairCtx1.drawImage(picture, 0, 0, 308, 312, 0, 25, 125, 130);
-        chairCtx2.drawImage(picture, 0, 0, 308, 312, 0, 25, 125, 130);
+    player1.onload = function(){
+        chairCtx1.drawImage(player1, 0, 0, 820, 888, 0, 25, 125, 130);
     }
+    player2.onload = function(){
+        chairCtx2.drawImage(player2, 0, 0, 410, 412, 0, 25, 125, 130);
+    }
+    player3.onload = function(){
+        chairCtx3.drawImage(player3, 0, 0, 410, 412, 0, 25, 125, 130);
+    }
+    player4.onload = function(){
+        chairCtx4.drawImage(player4, 0, 0, 410, 412, 0, 25, 125, 130);
+    }
+    player5.onload = function(){
+        playerCtx.drawImage(player5, 0, 0, 408, 412, 0, 25, 125, 130);
+    }
+    player6.onload = function(){
+        chairCtx5.drawImage(player6, 0, 0, 496, 496, 0, 25, 125, 130);
+    }
+    player7.onload = function(){
+        chairCtx6.drawImage(player7, 0, 0, 496, 486, 0, 25, 125, 130);
+    }
+    
+    player1.src = "femluke.png";
+    player2.src = "player1.png";
+    player3.src = "player2.png";
+    player4.src = "player3.png";
+    player5.src = "player4.png";
+    player6.src = "player5.png";
+    player7.src = "player6.png";
+    
+    playerCtx.scale(2,2);
+    playerCtx.font = "bold 20px Frosty";
+    playerCtx.fillStyle = "white";
+    playerCtx.textAlign = "center";
 
-    picture.src = "picture.png";
-   
+    playerCtx.fillText("Name", 60, 20);
+    playerCtx.fillText("$1000", 60, 177);
+     
 </script>
 
 <style>
+    #table {
+        width: 880;
+        height: 440;
+    }
+    
     .chair{
         background: #2F2F2F;
         position: absolute;
         border-radius: 8px;
+        width: 125px;
+        height: 185px;
     }
     
     #chair1 {
-        top:-70px;
-        left: 625px;
+        top:-90px;
+        left: 600px;
     }
     
     #chair2 {
-        top:-70px;
-        left: 100px;
+        top:-90px;
+        left: 140px;
+    }
+    
+    #chair3 {
+        top:70px;
+        left: -30px;
+    }
+    
+    #chair4 {
+        top:70px;
+        left: 785px;
+    }
+    
+    #chair5 {
+        top:300px;
+        left: 645px;
+    }
+    
+    #chair6 {
+        top:300px;
+        left: 115px;
     }
     
     #player {
@@ -107,6 +193,8 @@
         position: absolute;
         border-radius: 5px;
         opacity: 0.85;
+        width: 100;
+        height: 125;
 
     }
     
@@ -120,16 +208,28 @@
     
     .card {
         position:absolute;
-        background: grey;
         border-radius: 5px;
     }
     
     #card1 {
-        left: 400px;
+        left: 410px;
+        background: grey;
         top:340px;
+        border:black solid 1px;
         -ms-transform: rotate(-15deg); /* IE 9 */
         -webkit-transform: rotate(-15deg); /* Safari */
         transform: rotate(-15deg); /* Standard syntax */
     }
+    
+    #card2 {
+        background: white;
+        top:340px;
+        left:447px;
+        border:black solid 1px;
+        -ms-transform: rotate(15deg); /* IE 9 */
+        -webkit-transform: rotate(15deg); /* Safari */
+        transform: rotate(15deg); /* Standard syntax */
+    }
+    
 
 </style>
