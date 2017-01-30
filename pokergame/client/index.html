@@ -1,0 +1,612 @@
+<!--<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="main.css">
+    </head>
+    <body>
+        <canvas id="table"></canvas>
+        <button id="startButton">Start Game</button>
+    </body>
+</html>
+-->
+
+
+<div id="container">
+    <canvas id="table" class="canvas"></canvas>
+    
+    <canvas id="chair0" class="chair" onclick="selectChair(0)" onmouseover="hover(0)" onmouseout="unhover(0)"></canvas>
+    <canvas id="chair1" class="chair" onclick="selectChair(1)" onmouseover="hover(1)" onmouseout="unhover(1)"></canvas>
+    <canvas id="chair2" class="chair" onclick="selectChair(2)" onmouseover="hover(2)" onmouseout="unhover(2)"></canvas>
+    <canvas id="chair3" class="chair" onclick="selectChair(3)" onmouseover="hover(3)" onmouseout="unhover(3)"></canvas>
+    <canvas id="chair4" class="chair" onclick="selectChair(4)" onmouseover="hover(4)" onmouseout="unhover(4)"></canvas>
+    <canvas id="chair5" class="chair" onclick="selectChair(5)" onmouseover="hover(5)" onmouseout="unhover(5)"></canvas>
+    <canvas id="chair6" class="chair" onclick="selectChair(6)" onmouseover="hover(6)" onmouseout="unhover(6)"></canvas>
+    <canvas id="chair7" class="chair" onclick="selectChair(7)" onmouseover="hover(7)" onmouseout="unhover(7)"></canvas>
+    <canvas id="chair8" class="chair" onclick="selectChair(8)" onmouseover="hover(8)" onmouseout="unhover(8)"></canvas>
+    
+    <canvas id="tablecard0" class="tablecard"></canvas>
+    <canvas id="tablecard1" class="tablecard"></canvas>
+    <canvas id="tablecard2" class="tablecard"></canvas>
+    <canvas id="tablecard3" class="tablecard"></canvas>
+    <canvas id="tablecard4" class="tablecard"></canvas>
+    <h1 id="pot">Pot: 0</h1>
+
+</div>
+
+<div id="playerSide">
+    <div id="menu">
+        <div id="usernameContainer">
+            <input id="username" type="text" style="width:255px" placeholder="Username"/>
+            <button id="usernameButton" class="buttonStyle" onclick="ready()">Ready</button>
+        </div>
+        <div id=cards>
+            <canvas id="card1" class="card" style="visibility:hidden;"></canvas>
+            <canvas id="card2" class="card" style="visibility:hidden;"></canvas>
+        </div>
+        <div id="playButtons">
+            <button id="fold" class="buttonStyle" onclick="fold()" style="visibility:hidden;">Fold</button>
+            <button id="call" class="buttonStyle" onclick="call()" style="visibility:hidden;">Call</button>
+            <button id="raise" class="buttonStyle" onclick="raise()" style="visibility:hidden;">Raise</button>
+            <input id="raiseAmount" type="text" placeholder="Amount" style="visibility:hidden;"/>
+        </div>
+    </div>
+    <div id="chat">
+        <div id="chat-text" style="width:520px;height:250px;overflow-y:scroll; margin-top:10px; margin-left:10px;" ></div>
+        <form id="chat-form">
+            <input id="chat-input" type="text" style="width:520px; margin-left:10px;" disabled="true"/>
+        </form>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+<script>
+
+    var hoverOn = [];
+    var playername = '';
+    var inGame = false;
+    var callDetails = {};
+        
+    var chatText = document.getElementById('chat-text');
+    var chatInput = document.getElementById('chat-input');
+    var chatForm = document.getElementById('chat-form');
+    
+    
+    for(var i = 0; i < 9; i++){
+        hoverOn[i] = true;
+    }
+    
+    window.onload = function(){
+        drawBackground();
+        printAvailablePosition();
+        socket.emit('getSeats',"Hello");
+    }
+    
+    var socket = io();
+   
+    var random = Math.random();
+    
+    var start = function(){ 
+        socket.emit('happy',{
+            reason:'its my birthday' + random
+        });
+        drawBackground();
+    }
+   
+    socket.on('serverMsg',function(data){
+        console.log(data.msg); 
+    });
+   
+    chatForm.onsubmit = function(e){
+        e.preventDefault();
+        if(chatInput.value != '') socket.emit('sendMsgToServer',chatInput.value);
+        chatInput.value = '';  
+    }
+    
+    socket.on('addToChat',function(data){
+        chatText.innerHTML += '<div>' + data + '</div>';
+        chatText.scrollTop = chatText.scrollHeight;
+    });
+    
+    socket.on('evalAnswer',function(data){
+        console.log(data);
+    });
+    
+    socket.on('updateSeats',function(data){
+        var pot = document.getElementById("pot");
+        pot.innerHTML = "Pot: "+data.pot;
+        for(var i = 0; i < 9;i++){
+            var chair = document.getElementById('chair'+i);
+            var chairCtx = chair.getContext("2d");
+            if(data.chairs[i].occupied == true){
+                hoverOn[i]=true;
+                chair.style.background = ("transparent url('') no-repeat center center");
+                chair.style.opacity = 0.9;
+
+                for(var k in data.players){
+                    if(data.players[k].position == i){
+                        var name = data.players[k].name;
+                        chairCtx.clearRect(0,0,chair.width,chair.height);
+                        chairCtx.font = "36px Comic Sans MS";
+                        chairCtx.fillStyle = "white";
+                        chairCtx.textAlign = "left";
+                        chairCtx.fillText(data.players[k].name+": "+data.players[k].amount, 10,50);
+                        
+                    }
+                }
+
+            }else if(data.chairs[i].occupied == false){
+                if(playername !='' && !inGame){ 
+                    hoverOn[i] = false;
+                }else{
+                    chairCtx.clearRect(0,0,chair.width,chair.height);
+                }
+            }
+
+        }
+    });
+    
+    socket.on('sendCards', function(data){
+        var cards = new Image();
+        var card1 = document.getElementById('card1');
+        var card2 = document.getElementById('card2');
+        var card1Ctx = card1.getContext("2d");
+        var card2Ctx = card2.getContext("2d");
+        var test = data[0].typeID - 1;
+        
+        card1.width = 148;
+        card1.height = 196;
+        card2.width = 148;
+        card2.height = 196;
+        
+        cards.onload = function(){
+            card1Ctx.drawImage(cards, (data[0].typeID - 1)*73, (data[0].suitID - 1)*98, 74, 98, 0, 0, 148, 196);
+            card2Ctx.drawImage(cards, (data[1].typeID - 1)*73, (data[1].suitID - 1)*98, 74, 98, 0, 0, 148, 196);
+            //card1Ctx.drawImage(cards, 0, 0, 155,56);
+        }
+        cards.src = "client/img/cards.png";
+    });
+    
+    socket.on("allow", function(data){
+        if(data){
+            document.getElementById("fold").style.visibility = "visible";
+            document.getElementById("call").style.visibility = "visible";
+            document.getElementById("raise").style.visibility = "visible";
+            document.getElementById("raiseAmount").style.visibility = "visible";
+        }else if(!data){
+            document.getElementById("fold").style.visibility = "visible";
+            document.getElementById("call").style.visibility = "visible";
+            document.getElementById("raise").style.visibility = "visible";
+            document.getElementById("raiseAmount").style.visibility = "visible";
+            document.getElementById("call").innerText = "Check";
+        }
+    });
+    
+    socket.on("clearCards", function(){
+        clearCards();
+    });
+    
+    socket.on("sendMinCall", function(data){
+        callDetails = data;
+    });
+    
+    socket.on('drawTableCard', function(data){
+        var cards = new Image();
+        var tablecard = document.getElementById("tablecard"+data.x);
+        var tablecardCtx = tablecard.getContext("2d");
+        
+        tablecard.width = 74;
+        tablecard.height = 98;
+        
+        cards.onload = function(){
+            tablecardCtx.drawImage(cards, (data.typeID - 1)*73, (data.suitID - 1)*98, 74, 98, 0, 0, 74, 98);
+        }
+        cards.src ="client/img/cards.png"; 
+    });
+    
+    function raise(){
+        var input = document.getElementById("raiseAmount");
+        var button = document.getElementById("raise");
+    
+        var cb = function(data){
+            console.log("Input:"+input.value+"\nMinimum call:"+data.mincall+"\nGame call:"+data.currcall);
+            if(input.value >= data.mincall*2 && input.value > data.currcall){
+                socket.emit("raise",input.value);
+                input.value = '';
+                unallow();
+            }
+        }
+        
+        socket.emit("getMinCall", cb);
+    }
+       
+    function ready(){
+        var input = document.getElementById("username");
+        var button = document.getElementById("usernameButton");
+        
+        if(input.value != '' ){
+            document.getElementById("chat-input").disabled = false;
+            
+            playername = input.value;
+            socket.emit('getSeats',"Hello");
+            
+            socket.emit('joinedToServer',input.value+" has joined");
+            chatText.scrollTop = chatText.scrollHeight;
+            
+            button.parentNode.removeChild(button);
+            input.parentNode.removeChild(input);
+            
+            socket.emit('playerName',input.value);
+        
+        }else{
+            alert("Please use more than 3 characters")
+        }
+    }
+    
+    function fold(){
+        socket.emit("fold");
+        unallow();
+    }
+    
+    function allow(){
+        document.getElementById("fold").style.visibility = "visible";
+        document.getElementById("call").style.visibility = "visible";
+        document.getElementById("raise").style.visibility = "visible";
+        document.getElementById("raiseAmount").style.visibility = "visible";
+    }
+    
+    function unallow(){
+        document.getElementById("fold").style.visibility = "hidden";
+        document.getElementById("call").style.visibility = "hidden";
+        document.getElementById("raise").style.visibility = "hidden";
+        document.getElementById("raiseAmount").style.visibility = "hidden";
+    }
+    
+    function drawBackground(){
+        var tableCanvas = document.getElementById("table");
+        var tableCtx = tableCanvas.getContext("2d");
+        var table = new Image();
+        
+        tableCanvas.width  = 900;
+        tableCanvas.height = 500;
+        
+        table.onload = function(){
+             tableCtx.drawImage(table, 0, 0, 900,500);
+        }
+        table.src = "client/img/table.png";
+    }
+
+    function call(){
+        socket.emit('call');
+        unallow();
+    }
+    
+    function printAvailablePosition(){
+        var chair = [];
+        for(var i = 0; i < 9; i++)	chair[i] = document.getElementById('chair'+i);
+
+        var ctx = [];
+        for(var i = 0; i < 9; i++){	
+            ctx[i] = chair[i].getContext('2d');
+            ctx[i].save();
+            var playButton = new Image();
+            
+            playButton.onload = function(){
+                 ctx[i].drawImage(table, 0, 0, 155,56);
+            }
+            table.src = "client/img/play-button-3.png";
+        }
+         
+        /*
+            var positionCanvas = document.getElementById("position");
+            var positionCtx = positionCanvas.getContext("2d");    
+
+            positionCtx.fillStyle = "white";
+            positionCtx.font = "15px Arial";
+            positionCtx.fillText("Available", x,y);
+        */
+    }
+    
+    function clearCards(){
+        document.getElementById("card1").style.visibility = "hidden";            document.getElementById("card2").style.visibility = "hidden";
+    }
+    
+    function selectChair(x){
+        if(playername != ''){
+            var chair = document.getElementById('chair'+x);
+            chair.style.background = ("transparent url('') no-repeat center center");
+            chair.style.opacity = 0.9;      
+            socket.emit('takePlace', x);
+
+            for(var i = 0; i < 9;i++){
+                hoverOn[i]=true;
+            }
+
+            inGame = true;
+            document.getElementById("card1").style.visibility = "visible";            document.getElementById("card2").style.visibility = "visible";
+        }
+    }
+
+    //hover effects
+    function hover(x){
+        if(!hoverOn[x]){
+            var chair = document.getElementById('chair'+x);
+            chair.style.background = ("black url('client/img/play-button-4.png') no-repeat center center");
+            chair.style.opacity = 0.7;
+        }
+    }
+    
+    function unhover(x){
+        if(!hoverOn[x]){
+            var chair = document.getElementById('chair'+x);
+            chair.style.background = ("transparent url('') no-repeat center center");
+            chair.style.opacity = 0.9;
+        }
+    }
+
+    //number filter JQuery
+    $(document).ready(function() {
+        $("#txtboxToFilter").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                 // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || 
+                 // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                     // let it happen, don't do anything
+                     return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    $(function() {
+      $('#menu').on('keydown', '#raiseAmount', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+    })
+    
+</script>
+
+<style>
+    #test{
+  
+        width:950px;
+        height:392px;
+    }
+    
+    .canvas{
+        position:absolute;
+        top: 0;
+        width: 900px;
+        height: 500px;
+    }
+    
+    #container{
+        position:relative;
+        width: 900px;
+        height: 500px;
+        margin: auto;
+    }
+    
+    #playerSide {
+        margin: 0 auto;
+        width: 900px;
+        height: 300px;
+        border: 2px solid grey;
+        border-radius: 15px;
+    }
+    
+    #gameButton {
+        margin: 500px auto;
+    }
+    
+    #chat-input {
+        height: 25px;
+        font-size: 15px;
+        padding-left: 5px;
+    }
+    
+    #menu {
+        width: 350px;
+        height: 300px;
+        float: right;
+        border: 2px solid grey;
+        border-radius: 15px;
+        margin-top: -2px;
+        margin-right: -2px;
+    }
+    
+    #chat {
+        width: 540px;
+        height: 300px;
+        float: left;
+        border: 2px solid grey;
+        border-radius: 15px;
+        margin-top: -2px;
+        margin-left: -2px;
+    }
+    
+    #username {
+        display: inline;
+        margin-top: 10px;
+        margin-left: 7px;
+        height: 30px;
+        font-size: 15px;
+        padding-left: 5px;
+    }
+    
+    #usernameButton {
+        margin-right: 7px;
+        float: right;
+        margin-top: 10px;
+
+    }
+        
+    .buttonStyle:hover{
+        opacity: 1;
+    }
+    
+    .buttonStyle {
+        background-color: #008CBA; 
+        border: none;
+        color: white;
+        padding: 6px 13px;
+        text-align: center;
+        text-decoration: none;
+        display: inline;
+        font-size: 16px;
+        opacity: 0.8;
+        margin-left: 3px;
+    }
+    #fold{
+        margin-left: 7px;
+        margin-top: 10px;
+    }
+    
+    #call {
+        margin-top: 10px;
+    }
+    
+    #raise {
+        margin-top: 10px;
+    }
+    
+    #raiseAmount {
+        margin-top: 10px;
+        margin-right: 7px;
+        height: 30px;
+        font-size: 15px;
+        padding-left: 5px;
+        width: 100px;
+        display: inline;
+        margin-left: 5px;
+        margin-top: 10px;
+    }
+    
+    .card {
+        width: 148px;
+        height: 196px;
+        margin-top: 30px;
+    }
+    
+    #card1{
+        float:left;
+        margin-left: 25px;
+    }
+    
+    #card2{
+        float: right;
+        margin-right: 25px;
+    }
+    
+    .chair{
+        position:absolute;
+        width: 155px;
+        height: 56px;
+        background-color: transparent;
+        opacity: 0.9;
+        border: 1px solid white;
+    }
+    
+    #chair0 {
+        top:11px;
+        left:170px;
+    }
+    
+    #chair1 {
+        top:11px;
+        left:554px;
+    }
+    
+    #chair2 {
+        top:110px;
+        left:711px;
+    }
+    
+    #chair3 {
+        top:235px;
+        left:711px;
+    }
+    
+    #chair4 {
+        top:360px;
+        left:643px;
+    }
+    
+    #chair5 {
+        top:430px;
+        left:361px;
+    }
+    
+    #chair6 {
+        top:360px;
+        left:82px;
+    }
+    
+    #chair7 {
+        top:235px;
+        left:13px;
+    }
+    
+    #chair8 {
+        top:110px;
+        left:13px;
+    }
+    
+    .tablecard{
+        height:98px;
+        width:74px;
+        position:absolute;
+    }
+    
+    #tablecard0{
+        margin-top: 150px;
+        margin-left: 220px;
+    }
+    
+    #tablecard1{
+        margin-top: 150px;
+        margin-left: 309px;
+    }
+    
+    #tablecard2{
+        margin-top: 150px;
+        margin-left: 398px;
+    }
+    
+    #tablecard3{
+        margin-top: 150px;
+        margin-left: 487px;
+    }
+    
+    #tablecard4{
+        margin-top: 150px;
+        margin-left: 576px;
+    }
+    
+    #pot{
+        position: absolute;
+        font-size: 25px;
+        font-family: Comic Sans MS;
+        margin-top: 268px;
+        margin-left: 380px;
+    }
+
+</style>
+
+
+<!--
+<div id="container">
+  <canvas id="viewport">
+  </canvas>
+  <menu id="controls">
+      <menuitem onclick="sayHello()">Action</menuitem>
+      <menuitem>Another action</menuitem>
+  
+  </menu>
+</div>
+
+-->

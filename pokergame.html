@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            div.card{
+                width:100px;
+                height: 100px;
+                background:#F5F5F5;
+                border:#999 1px solid;
+                padding:10px;
+                font-size:24px;
+                text-align:center;
+                margin:5px;
+                display: inline-block;
+            }
+            
+            #cardsOnTheTable{
+                 margin-top: 150px;
+                 text-align: center;
+            }
+            #table{
+                width:800px;
+                height:400px;
+                background:#3D9970;
+                margin:0 auto;
+                border:#542f11 40px solid;
+                border-radius:250px;
+                text-align:center;
+            }
+
+            #gameButton {
+                background-color: #FF851B; 
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+            }
+            #gameButton:hover{
+                 background-color: #FF4136; 
+                 padding: 16px 33px;
+                 font-size: 16px;
+            }
+            
+            #playerOne {
+                display: inline-block;
+                margin-right: 150px;
+            }
+            
+            #playerTwo {
+                display: inline-block;
+            }
+            
+            #players {
+                text-align:center;
+            }
+            
+        </style>
+        <script>
+
+            var counter = 0;
+            
+            Card = function(){
+                var temp = getCard();
+                
+                 var self = {
+                    type:temp.type,
+                    suit:temp.suit,
+                    typeID:temp.typeID,
+                    suitID:temp.suitID
+                }
+
+                Card.list[counter] = self;
+                counter = counter + 1;
+                
+                self.test = function(){
+                    console.log("Hello World");
+                }
+                
+                return self;
+            }
+
+            Player = function(id,x){
+                var self = {
+                    id:id,
+                    cards:x
+                }
+                
+                function addCard(x){
+                    self.cards.push(x);
+                }
+                
+                return self;
+            }
+            
+
+            
+            Card.list = {};
+            var cardsOnTheTable = [];
+            var playerOneCards = [];
+            var playerTwoCards = [];
+            
+            
+            function compare(a,b){
+                return a.typeID-b.typeID;
+            }
+            
+            function secondCompare(a,b){
+                return a - b;
+            }
+            
+            function play(){
+                var test = [{x:1,y:1},{x:7,y:3},{x:4,y:1},{x:4,y:3},{x:4,y:2},{x:4,y:3}];
+                test.sort(function(a,b){
+                    if(a.x != b.x){
+                        return a.x-b.x;
+                    }else{
+                        return a.y-b.y;
+                    }
+                });
+                console.log(test);
+                var button = document.getElementById("gameButton");
+                
+                if(button.firstChild.data === "Play"){
+                
+                    giveCards();
+                    button.firstChild.data = "Give Cards";
+                
+                }else if(button.firstChild.data === "Give Cards"){
+                    
+                    if(cardsOnTheTable.length === 0){
+                        var tableCard1 = document.getElementById("tableCard1");
+                        var tableCard2 = document.getElementById("tableCard2");
+                        var tableCard3 = document.getElementById("tableCard3");
+
+                        drawCard(tableCard1,1);
+                        drawCard(tableCard2,1);
+                        drawCard(tableCard3,1);
+                    
+                    }else if(cardsOnTheTable.length === 3){
+                    
+                        var tableCard1 = document.getElementById("tableCard4");
+                        
+                        drawCard(tableCard4,1);
+                    
+                    }else if(cardsOnTheTable.length === 4){
+                        
+                        var tableCard1 = document.getElementById("tableCard5");
+                    
+                        drawCard(tableCard5,1);
+                        button.firstChild.data = "Again?";
+                        var temp = [];
+                        temp.push(checkCombination(playerOneCards));
+                        temp.push(checkCombination(playerTwoCards));
+                        
+                    }
+                }
+            }
+
+            function giveCards(){
+                var player1Card1 = document.getElementById("player1Card1");
+                var player1Card2 = document.getElementById("player1Card2");
+                
+                var player2Card1 = document.getElementById("player2Card1");
+                var player2Card2 = document.getElementById("player2Card2");
+                
+                drawCard(player1Card1,2);
+                drawCard(player1Card2,2);
+                drawCard(player2Card1,3);
+                drawCard(player2Card2,3);
+                
+            }
+            
+            function drawCard(place,x){
+                var card = Card();
+                var suit =  card.suit;
+                var type = card.type;
+                
+                place.innerHTML = type + "<br/>" + suit;
+                
+                if(x == 1){           
+                    cardsOnTheTable.push(card);
+                    playerOneCards.push(card);
+                    playerTwoCards.push(card);    
+                }else if(x == 2){
+                    playerOneCards.push(card);
+                }else if(x == 3){
+                    playerTwoCards.push(card);
+                }
+            }
+            
+            function returnSuit(x){
+                switch (x) {
+                    case 1:
+                        return "diamond";
+                    case 2:
+                        return "spade";
+                    case 3:
+                        return "heart";
+                    case 4:
+                        return "club";
+                }
+
+            }
+            
+            function returnType(x){
+                if(x <= 10){
+                    return x;
+                }else{
+                    switch (x) {
+                    case 11:
+                        return "Jack";
+                    case 12:
+                        return "Queen";
+                    case 13:
+                        return "King";
+                    case 14:
+                        return "Ace";
+                    }
+                }
+            }
+
+            function getCard(){
+                var check = true;
+                var secondCheck = 0;
+                var type;
+                var suit;
+                while(check){
+                    type = Math.floor(Math.random() * 13) + 2;
+                    suit = Math.floor(Math.random() * 4) + 1;
+                    
+                    for( var i in Card.list){
+                        var temp = Card.list[i];
+                        if(temp.suit === returnSuit(suit) && temp.type === returnType(type)){
+                            secondCheck = 1;
+                        }
+                    }
+                    
+                    if(secondCheck === 0){
+                        check = false;
+                    }
+                    
+                    secondCheck = 0;
+                }
+                
+                return {
+                    suit: returnSuit(suit),
+                    type: returnType(type),
+                    typeID: type,
+                    suitID: suit
+                };
+            }    
+        
+            function checkCombination(array){
+                var suits = new Array(4);
+                var matched = new Array(13);
+                var pairs = [];
+                var threes = [];
+                var fours = [];
+                var flush = false;
+                var straight = false;
+                var rank = 0;
+                
+                array.sort(compare);
+                
+                for(var i = 0; i < 4; i++){
+                    suits[i] = 0;
+                }
+                
+                for(var i = 0; i < 13; i++){
+                    matched[i] = 0;
+                }
+                
+                for(var i = 0; i < 7; i++){
+                    matched[array[i].typeID-2]++;
+                    suits[array[i].suitID]++;
+                }
+                
+                for(var i = 0; i < 13; i++){
+                    if(matched[i] == 2){
+                        pairs.push(i+2);
+                    }else if(matched[i] == 3){
+                        threes.push(i+2);
+                    }else if(matched[i] == 4){
+                        fours.push(i+2);
+                    }
+                }
+                
+                var combinationCards = [];
+                
+                for(var i = 2; i >= 0; i--){
+                    if(array[i+4].typeID - array[i].typeID == 4 && 
+                       array[i+3].typeID - array[i].typeID == 3 && 
+                       array[i+2].typeID - array[i].typeID == 2 && 
+                       array[i+1].typeID - array[i].typeID == 1){
+                        
+                        if(flush){ 
+                            if(array[i+4] == 14){
+                                rank = 9;
+                                combinationCards = getList(array,i);
+                            }else{
+                                if(8 > rank){
+                                    rank = 8;
+                                    combinationCards = [];
+                                    combinationCards = getList(array,i);
+                                }
+                            }
+                         }else{
+                            if(4 > rank){
+                                rank = 4;
+                                combinationCards = [];
+                                combinationCards = getList(array,i);
+                            }
+                        }
+
+                    }
+                }
+                
+                for(var i = 0; i < 4; i++){
+                    if(suits[i] == 5){
+                        flush = true;
+                        if(5 > rank){
+                            combinationCards = [];
+                            for(var k = array.length-1; k >=0; k--){
+                                if(combinationCards.length < 5 && array[k].suitID == suits[i]){
+                                    combinationCards.push(array[k]);
+                                }
+                            }
+                            rank = 5;
+                        }
+                    }
+                }
+                
+                threes.sort(secondCompare);
+                pairs.sort(secondCompare);
+                
+                if(fours.length > 0){
+                    if(7 > rank){
+                        combinationCards = [];
+                        if(7 > rank){
+                            for(var i = 0; i < array.length; i++){
+                                if(fours[0] == array[i].typeID){
+                                    combinationCards.push(array[i]);
+                                }
+                            }
+                            combinationCards.push(getMax(array,combinationCards));
+                            rank = 7;
+                        }
+                    }
+                }else if(threes.length > 0 && pairs.length > 0){
+                    if(6 > rank){
+                        combinationCards = [];
+                        
+                        for(var i = 0; i < array.length; i++){
+                            if(array[i].typeID == threes[threes.length-1] || 
+                               array[i].typeID == pairs[pairs.length-1]){
+                                combinationCards.push(array[i]);
+                            }
+                        }
+                        
+                        rank = 6;
+                    }
+                }else if(threes.length > 0){
+                    if(3 > rank){
+                        combinationCards = [];
+                        
+                        for(var i = 0; i < array.length; i++){
+                            if(array[i].typeID == threes[threes.length-1]){
+                                combinationCards.push(array[i]);
+                            }
+                        }
+                        
+                        combinationCards.push(getMax(array,combinationCards));
+
+                        combinationCards.push(getMin(array,combinationCards));
+                        
+                        rank = 3;
+                    }
+                }else if(pairs.length >= 2){
+                    if(2 > rank){
+                        for(var i = 0; i < array.length; i++){
+                            if(array[i].typeID == pairs[pairs.length-1] || 
+                               array[i].typeID == pairs[pairs.length-2]){
+                                combinationCards.push(array[i]);
+                            }
+                        }
+                        
+                        combinationCards.push(getMax(array,combinationCards));
+                        
+                        rank = 2;
+                    }
+                }else if(pairs.length == 1){
+                    if(1 > rank){
+                        for(var i = 0; i < array.length; i++){
+                            if(array[i].typeID == pairs[pairs.length-1]){
+                                combinationCards.push(array[i]);
+                            }
+                        }
+ 
+                        combinationCards.push(getMax(array,combinationCards));
+                        combinationCards.push(getMax(array,combinationCards));
+                        
+                        combinationCards.push(getMin(array,combinationCards));
+                        
+                        rank = 1;
+                    }
+                }else {
+                    if(0 >= rank){
+                        array.sort(compare);
+                        var counter = 0;
+                        
+                        for(var i = array.length-1; i >= 0; i--){
+                            if(counter == 4){
+                                break;
+                            }else{
+                                if(array[i].typeID != pairs[pairs.length-1]){
+                                    combinationCards.push(array[i]);
+                                    counter++;
+                                }
+                            }
+                        }
+                        var temp = [];
+                        
+                        combinationCards.push(getMin(array,combinationCards));
+                        rank = 0;
+                    }
+                }
+                
+                console.log(rank);
+                console.log(combinationCards);
+                
+                return {
+                    rank:rank,
+                    combination:combinationCards
+                };
+
+            }
+                
+            function getList(array,i){
+                var temp = [];
+                
+                temp.push(array[i]);
+                temp.push(array[i+1]);
+                temp.push(array[i+2]);
+                temp.push(array[i+3]);
+                temp.push(array[i+4]);
+                temp.sort(compare);
+                
+                return temp;
+            }
+            
+            function getMin(array,x){
+                var min = Infinity, key;
+                
+                array.forEach(function (v, k) { 
+                    if (min > v.typeID && !x.contains(v)) { 
+                        min = v.typeID; 
+                        key = k; 
+                    }
+                 });
+
+                return array[key];
+            }
+            
+            function getMax(array,x){
+                var max = -Infinity, key;
+                
+                array.forEach(function (v, k) { 
+                    if (max < v.typeID && !x.contains(v)) { 
+                        max = v.typeID; 
+                        key = k; 
+                    }
+                 });
+
+                return array[key];
+            }
+            
+            Array.prototype.contains = function(obj) {
+                var i = this.length;
+                while (i--) {
+                    if (this[i].typeID === obj.typeID) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            function checkWinner(array){
+                
+            }
+            
+        </script>
+    </head>
+        <body>
+            <div id="table">
+                <div id="cardsOnTheTable">
+                    <div id="tableCard1" class="card">0</div>
+                    <div id="tableCard2" class="card">0</div>
+                    <div id="tableCard3" class="card">0</div>
+                    <div id="tableCard4" class="card">0</div>
+                    <div id="tableCard5" class="card">0</div>
+                </div>
+                <button id="gameButton" onclick="play()">Play</button>
+            </div>
+            <div id="players">
+                <div id="playerOne">
+                    <div id="player1Card1" class="card">0</div>
+                    <div id="player1Card2" class="card">0</div>
+                </div>
+                <div id="playerTwo">
+                    <div id="player2Card1" class="card">0</div>
+                    <div id="player2Card2" class="card">0</div>
+                </div>
+            </div>
+            <h2 id="status" style="clear:left;"></h2>
+        </body>
+</html>
