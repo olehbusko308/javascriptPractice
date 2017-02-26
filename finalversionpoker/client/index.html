@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="client/main.css">
+        <script src="client/jquery.js"></script>
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    </head>
+
+    <body>
+        <script>var socket = io();</script>
+        <script src="client/javascript.js"></script>
+        
+        <div id="container">
+            <!-- background and dealer -->
+            <canvas id="table" width="1760" height="880"></canvas>
+            <canvas id="dealer" width="200" height="240";></canvas>
+            
+            
+            <!-- table cards -->
+            <canvas id="tablecard1" class="card" width="160" height="230"></canvas>
+            <canvas id="tablecard2" class="card" width="160" height="230"></canvas>
+            <canvas id="tablecard3" class="card" width="160" height="230"></canvas>
+            <canvas id="tablecard4" class="card" width="160" height="230"></canvas>
+            <canvas id="tablecard5" class="card" width="160" height="230"></canvas>
+            
+            
+            
+            
+            <!-- player's position and cards -->
+            <canvas id="player" width="250" height="370" class="chair" onmouseover="hover(7)" onmouseout="unhover(7)" onclick="select_position(7)"></canvas>
+            <canvas id="playercard1" class="card" width="160" height="230" style="visibility:hidden"></canvas>
+            <canvas id="playercard2" class="card" width="160" height="230" style="visibility:hidden"></canvas>
+            
+            <canvas id="playercall" class="amount_style" width="220" height="54"></canvas>
+            <canvas id="playerchip" class="chip_style" width="60" height="60"></canvas>
+                
+            
+            <!-- oponents' positions, their cards and call amount -->
+        <!-- chair one -->
+            <canvas id="chair1" class="chair" width="250" height="370" onmouseover="hover(1)" onmouseout="unhover(1)" onclick="select_position(1)"></canvas>
+            
+            <img id="chair1card1" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+            <img id="chair1card2" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+            
+            <canvas id="chair1call" class="amount_style" width="220" height="54"></canvas>
+            <canvas id="chair1chip" class="chip_style" width="60" height="60"></canvas>
+            
+        <!-- chair two -->
+            <canvas id="chair2" class="chair" width="250" height="370" onmouseover="hover(2)" onmouseout="unhover(2)" onclick="select_position(2)"></canvas>
+            
+            <img id="chair2card1" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;" >
+            <img id="chair2card2" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+
+            <canvas id="chair2call" class="amount_style" width="220" height="54"></canvas>
+            <canvas id="chair2chip" class="chip_style" width="60" height="60"></canvas>
+            
+        <!-- chair three -->
+            <canvas id="chair3" class="chair" width="250" height="370" onmouseover="hover(3)" onmouseout="unhover(3)" onclick="select_position(3)"></canvas>
+            
+            <img id="chair3card1" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+            <img id="chair3card2" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+
+            <canvas id="chair3call" class="amount_style" width="220" height="54"></canvas>
+            <canvas id="chair3chip" class="chip_style" width="60" height="60"></canvas>
+            
+        <!-- chair four -->
+            <canvas id="chair4" class="chair" width="250" height="370" onmouseover="hover(4)" onmouseout="unhover(4)" onclick="select_position(4)"></canvas>
+            
+            <img id="chair4card1" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+            <img id="chair4card2" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+ 
+            <canvas id="chair4call" class="amount_style" width="220" height="54"></canvas>
+            <canvas id="chair4chip" class="chip_style" width="60" height="60"></canvas>
+            
+        <!-- chair five -->
+            <canvas id="chair5" class="chair" width="250" height="370" onmouseover="hover(5)" onmouseout="unhover(5)" onclick="select_position(5)"></canvas>
+            
+            <img id="chair5card1" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+            <img id="chair5card2" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+            
+            <canvas id="chair5call" class="amount_style" width="220" height="54"></canvas>
+            <canvas id="chair5chip" class="chip_style" width="60" height="60"></canvas>
+            
+        <!-- chair six -->
+            <canvas id="chair6" class="chair" width="250" height="370" onmouseover="hover(6)" onmouseout="unhover(6)" onclick="select_position(6)"></canvas>
+            
+            <img id="chair6card1" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+            <img id="chair6card2" src="client/img/backofcard.png" style="width:35px;height:49px; visibility:hidden;">
+            
+            <canvas id="chair6call" class="amount_style" width="220" height="54"></canvas>
+            <canvas id="chair6chip" class="chip_style" width="60" height="60"></canvas>
+            
+            
+            <!-- player's actions -->
+            <button id="call" class="buttongame" onmouseover="over('call')" onmouseout="out('call')" onclick="call()" style="visibility:hidden">Call</button>
+            <button id="raise" class="buttongame" onmouseover="over('raise')" onmouseout="out('raise')" onclick="raise()" style="visibility:hidden">Raise</button>
+            <button id="fold" class="buttongame" onmouseover="over('fold')" onmouseout="out('fold')" style="visibility:hidden">Fold</button>
+            <div id="shadow" style="visibility:hidden"></div>
+
+            <!-- raise slider and an element that represents its value -->
+            <input id="slider" type="range" min="200" max="1000" value="200" step="100" onchange="change()" style="visibility:hidden"/>
+            <div id="value" style="visibility:hidden">$200</div>
+            
+        
+            <!-- game's pot and dealer position on a table -->
+            <canvas id="pot"  width="220" height="54"></canvas>
+            <canvas id="potimage" class="chip_style" width="60" height="60"></canvas>
+        
+            <img id="dealersign" src="client/img/dealerposition.png" width="25" height="25">
+
+            
+        </div>
+    </body>
+    
+</html>
